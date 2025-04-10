@@ -36,6 +36,7 @@ export function UserView() {
   const [filterName, setFilterName] = useState('');
 
   useEffect(() => {
+
     const getUsers = async () => {
       try {
         const data = await fetchUsers();
@@ -97,10 +98,11 @@ export function UserView() {
                 rowCount={users.length}
                 headLabel={[
                   { id: 'name', label: 'Name' },
-                  { id: 'company', label: 'Company' },
-                  { id: 'role', label: 'Role' },
-                  { id: 'isVerified', label: 'Verified', align: 'center' },
-                  { id: 'status', label: 'Status' },
+                  { id: 'email', label: 'Email' },
+                  { id: 'province', label: 'Province' },
+                  { id: 'district', label: 'District' },
+                  { id: 'subdistrict', label: 'Subdistrict' },
+                  { id: 'village', label: 'Village' },
                   { id: '' }, // kolom kosong buat tombol aksi (misal edit/delete)
                 ]}
                 numSelected={table.selected.length}

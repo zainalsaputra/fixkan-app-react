@@ -10,7 +10,7 @@ import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
 
-import { Label } from 'src/components/label';
+// import { Label } from 'src/components/label';
 import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
@@ -18,11 +18,14 @@ import { Iconify } from 'src/components/iconify';
 export type UserProps = {
   id: string;
   name: string;
-  role: string;
-  status: string;
-  company: string;
-  avatarUrl: string;
-  isVerified: boolean;
+  email: string;
+  location: {
+    province: string;
+    district: string;
+    subdistrict: string;
+    village: string;
+  };
+  avatarUrl: '';
 };
 
 type UserTableRowProps = {
@@ -41,6 +44,15 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
   const handleClosePopover = useCallback(() => {
     setOpenPopover(null);
   }, []);
+
+  const capitalizeWords = (str?: string) => {
+    if (!str?.trim()) return '-';
+    return str
+      .toLowerCase()
+      .split(' ')
+      .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
 
   return (
     <>
@@ -62,11 +74,17 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
           </Box>
         </TableCell>
 
-        <TableCell>{row.company}</TableCell>
+        <TableCell>{row.email}</TableCell>
 
-        <TableCell>{row.role}</TableCell>
+        <TableCell>{capitalizeWords(row.location.province)}</TableCell>
 
-        <TableCell align="center">
+        <TableCell>{capitalizeWords(row.location.district)}</TableCell>
+
+        <TableCell>{capitalizeWords(row.location.subdistrict)}</TableCell>
+
+        <TableCell>{capitalizeWords(row.location.village)}</TableCell>
+
+        {/* <TableCell align="center">
           {row.isVerified ? (
             <Iconify width={22} icon="solar:check-circle-bold" sx={{ color: 'success.main' }} />
           ) : (
@@ -76,7 +94,7 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
 
         <TableCell>
           <Label color={(row.status === 'banned' && 'error') || 'success'}>{row.status}</Label>
-        </TableCell>
+        </TableCell> */}
 
         <TableCell align="right">
           <IconButton onClick={handleOpenPopover}>
