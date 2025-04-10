@@ -8,7 +8,7 @@ export async function fetchUsers() {
         const response = await axios.get(`${BASE_URL}/users`, {
             headers: {
                 Authorization:
-                    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImIwNzc3MzNkLWU3MjctNGNkNS04YTZjLTg4Zjk4ZjU5ZDdiMSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NDMwNjYwOCwiZXhwIjoxNzQ0MzEwMjA4fQ.1qh4O-PSrquzS0VdwbyRkotauc1PpbtUpm8h8whBYl8',
+                    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImIwNzc3MzNkLWU3MjctNGNkNS04YTZjLTg4Zjk4ZjU5ZDdiMSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0NDMxMDU3MiwiZXhwIjoxNzQ0MzE0MTcyfQ.WVY4tSM6CXvmMM2ICv1wm3Z6kApRbpjA2WH5_UAMujA',
             },
         });
 

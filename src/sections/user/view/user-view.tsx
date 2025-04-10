@@ -1,3 +1,4 @@
+import { varAlpha } from 'minimal-shared/utils';
 import { useState, useEffect, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
@@ -8,6 +9,7 @@ import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
+import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 
 import { fetchUsers } from 'src/utils/user-services';
 
@@ -34,20 +36,46 @@ export function UserView() {
 
   const [users, setUsers] = useState<UserProps[]>([]);
   const [filterName, setFilterName] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
 
     const getUsers = async () => {
       try {
+        setIsLoading(true);
         const data = await fetchUsers();
         setUsers(data);
       } catch (error) {
         console.error('Failed to fetch users:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     getUsers();
   }, []);
+
+  if (isLoading) {
+    return(
+      <Box
+    sx={{
+      display: 'flex',
+      flex: '1 1 auto',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}
+  >
+    <LinearProgress
+      sx={{
+        width: 1,
+        maxWidth: 320,
+        bgcolor: (theme) => varAlpha(theme.vars.palette.text.primaryChannel, 0.16),
+        [`& .${linearProgressClasses.bar}`]: { bgcolor: 'text.primary' },
+      }}
+    />
+  </Box>
+    )
+  }
 
   const dataFiltered = applyFilter({
     inputData: users,
