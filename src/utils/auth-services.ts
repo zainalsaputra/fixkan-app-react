@@ -1,9 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'https://sec-prediction-app-backend.vercel.app';
-
 export const login = async (email: string, password: string) => {
-  const response = await axios.post(`${API_URL}/auth/login`, {
+  const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
     email,
     password,
   });

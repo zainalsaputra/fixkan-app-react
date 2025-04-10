@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -8,6 +8,8 @@ import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
+
+import { fetchUsers } from 'src/utils/user-services';
 
 import { _users } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
@@ -24,15 +26,30 @@ import { emptyRows, applyFilter, getComparator } from '../utils';
 
 import type { UserProps } from '../user-table-row';
 
+
 // ----------------------------------------------------------------------
 
 export function UserView() {
   const table = useTable();
 
+  const [users, setUsers] = useState<UserProps[]>([]);
   const [filterName, setFilterName] = useState('');
 
-  const dataFiltered: UserProps[] = applyFilter({
-    inputData: _users,
+  useEffect(() => {
+    const getUsers = async () => {
+      try {
+        const data = await fetchUsers();
+        setUsers(data);
+      } catch (error) {
+        console.error('Failed to fetch users:', error);
+      }
+    };
+
+    getUsers();
+  }, []);
+
+  const dataFiltered = applyFilter({
+    inputData: users,
     comparator: getComparator(table.order, table.orderBy),
     filterName,
   });
@@ -76,23 +93,23 @@ export function UserView() {
               <UserTableHead
                 order={table.order}
                 orderBy={table.orderBy}
-                rowCount={_users.length}
-                numSelected={table.selected.length}
                 onSort={table.onSort}
-                onSelectAllRows={(checked) =>
-                  table.onSelectAllRows(
-                    checked,
-                    _users.map((user) => user.id)
-                  )
-                }
+                rowCount={users.length}
                 headLabel={[
                   { id: 'name', label: 'Name' },
                   { id: 'company', label: 'Company' },
                   { id: 'role', label: 'Role' },
                   { id: 'isVerified', label: 'Verified', align: 'center' },
                   { id: 'status', label: 'Status' },
-                  { id: '' },
+                  { id: '' }, // kolom kosong buat tombol aksi (misal edit/delete)
                 ]}
+                numSelected={table.selected.length}
+                onSelectAllRows={(checked) =>
+                  table.onSelectAllRows(
+                    checked,
+                    users.map((user) => user.id)
+                  )
+                }
               />
               <TableBody>
                 {dataFiltered
@@ -123,7 +140,7 @@ export function UserView() {
         <TablePagination
           component="div"
           page={table.page}
-          count={_users.length}
+          count={users.length}
           rowsPerPage={table.rowsPerPage}
           onPageChange={table.onChangePage}
           rowsPerPageOptions={[5, 10, 25]}
