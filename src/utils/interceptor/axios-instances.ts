@@ -27,8 +27,7 @@ axiosInstance.interceptors.response.use(
 
         if (!refreshToken) {
           localStorage.clear();
-          
-          window.location.href = '/login';
+          window.location.href = '/sign-in';
           return Promise.reject(error);
         }
         
@@ -47,7 +46,7 @@ axiosInstance.interceptors.response.use(
         console.error('Refresh token failed', err);
 
         localStorage.clear();
-        window.location.href = '/login';
+        window.location.href = '/sign-in';
       }
     }
 

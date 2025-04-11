@@ -1,3 +1,4 @@
+import { useSnackbar } from 'notistack';
 import { useState, useCallback } from 'react';
 
 import {
@@ -20,12 +21,13 @@ import { Iconify } from 'src/components/iconify';
 
 export function SignInView() {
   const router = useRouter();
+  const { enqueueSnackbar } = useSnackbar();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error] = useState('');
 
   const handleSignIn = useCallback(async () => {
     setLoading(true);
@@ -36,10 +38,10 @@ export function SignInView() {
         const redirectTo = localStorage.getItem('redirectAfterLogin') || '/';
         router.push(redirectTo);
       } else {
-        setError('Login gagal. Silakan cek kembali email dan password.');
+        enqueueSnackbar('Login gagal. Cek kembali email dan password.', { variant: 'error' });
       }
     } catch (err: any) {
-      setError('Login gagal. Silakan cek kembali email dan password.' + err);
+      enqueueSnackbar('Login gagal. Cek kembali email dan password.', { variant: 'error' });
     } finally {
       setLoading(false);
     }

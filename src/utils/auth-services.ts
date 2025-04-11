@@ -1,10 +1,12 @@
+import axios from 'axios';
+
 import axiosInstance from './interceptor/axios-instances';
 
 export async function login(email: string, password: string) {
   const BASE_URL = import.meta.env.VITE_PUBLIC_API_BASE_URL;
 
   try {
-    const response = await axiosInstance.post(`${BASE_URL}/auth/login`, {
+    const response = await axios.post(`${BASE_URL}/auth/login`, {
       email,
       password,
     });
@@ -17,8 +19,7 @@ export async function login(email: string, password: string) {
 
     return user;
   } catch (error) {
-    console.error('Login failed:', error);
-    throw error;
+    return console.error('Login failed:', error);
   }
 }
 
