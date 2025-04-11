@@ -33,20 +33,24 @@ export function SignInView() {
     setLoading(true);
     try {
       const user = await login(email, password);
-
-      if (user) {
-        const redirectTo = localStorage.getItem('redirectAfterLogin') || '/';
-        router.push(redirectTo);
-      } else {
-        enqueueSnackbar('Login gagal. Cek kembali email dan password.', { variant: 'error' });
+  
+      if (!user || user.role.name !== 'admin') {
+        enqueueSnackbar('Gagal masuk, periksa kembali email dan password anda.', { variant: 'error' });
+        return;
       }
-    } catch (err: any) {
-      enqueueSnackbar('Login gagal. Cek kembali email dan password.', { variant: 'error' });
+  
+      enqueueSnackbar(`Berhasil masuk, selamat datang kembali ${user.name}`, { variant: 'success' });
+  
+      const redirectTo = localStorage.getItem('redirectAfterLogin') || '/';
+      router.push(redirectTo);
+  
+    } catch (err) {
+      enqueueSnackbar('Gagal masuk, periksa kembali email dan password anda.', { variant: 'error' });
     } finally {
       setLoading(false);
     }
   }, [email, password, router]);
-
+  
 
   const renderForm = (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
