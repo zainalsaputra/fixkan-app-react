@@ -25,21 +25,25 @@ export function SignInView() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSignIn = useCallback(async () => {
+    setLoading(true);
     try {
-      const { token, user } = await login(email, password);
+      const user = await login(email, password);
 
-      // Simpan token ke localStorage atau cookies
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-
-      // Redirect ke dashboard
-      router.push('/');
+      if (user) {
+        router.push('/');
+      } else {
+        setError('Login gagal. Silakan cek kembali email dan password.');
+      }
     } catch (err: any) {
-      setError('Login gagal. Cek kembali email dan password.');
+      setError('Login gagal. Silakan cek kembali email dan password.');
+    } finally {
+      setLoading(false);
     }
   }, [email, password, router]);
+
 
   const renderForm = (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
@@ -85,9 +89,22 @@ export function SignInView() {
         </Typography>
       )}
 
-      <Button fullWidth size="large" type="submit" color="inherit" variant="contained" onClick={handleSignIn}>
+      {/* <Button fullWidth size="large" type="submit" color="inherit" variant="contained" onClick={handleSignIn}>
         Sign in
+      </Button> */}
+      
+      <Button
+        fullWidth
+        size="large"
+        type="submit"
+        color="inherit"
+        variant="contained"
+        onClick={handleSignIn}
+        disabled={loading}
+      >
+        {loading ? 'Signing in...' : 'Sign in'}
       </Button>
+
     </Box>
   );
 
