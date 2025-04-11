@@ -38,21 +38,30 @@ export function UserView() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-
     const getUsers = async () => {
       try {
         setIsLoading(true);
+  
+        const cachedUsers = localStorage.getItem('users');
+        if (cachedUsers) {
+          setUsers(JSON.parse(cachedUsers));
+          setIsLoading(false);
+          return;
+        }
+  
         const data = await fetchUsers();
         setUsers(data);
+        localStorage.setItem('users', JSON.stringify(data));
       } catch (error) {
         console.error('Failed to fetch users:', error);
       } finally {
         setIsLoading(false);
       }
     };
-
+  
     getUsers();
   }, []);
+  
 
   if (isLoading) {
     return(
