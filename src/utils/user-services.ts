@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axiosInstance from './interceptor/axios-instances';
 
 export async function fetchUsers() {
   const BASE_URL = import.meta.env.VITE_PUBLIC_API_BASE_URL;
@@ -10,7 +10,7 @@ export async function fetchUsers() {
   }
 
   try {
-    const response = await axios.get(`${BASE_URL}/users`, {
+    const response = await axiosInstance.get(`${BASE_URL}/users`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

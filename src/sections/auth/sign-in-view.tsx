@@ -33,7 +33,8 @@ export function SignInView() {
       const user = await login(email, password);
 
       if (user) {
-        router.push('/');
+        const redirectTo = localStorage.getItem('redirectAfterLogin') || '/';
+        router.push(redirectTo);
       } else {
         setError('Login gagal. Silakan cek kembali email dan password.');
       }
