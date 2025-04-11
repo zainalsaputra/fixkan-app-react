@@ -10,6 +10,8 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import { AuthLayout } from 'src/layouts/auth';
 import { DashboardLayout } from 'src/layouts/dashboard';
 
+import { ProtectedRoute } from './protected-routes';
+
 // ----------------------------------------------------------------------
 
 export const DashboardPage = lazy(() => import('src/pages/dashboard'));
@@ -31,6 +33,7 @@ const renderFallback = () => (
     <LinearProgress
       sx={{
         width: 1,
+        
         maxWidth: 320,
         bgcolor: (theme) => varAlpha(theme.vars.palette.text.primaryChannel, 0.16),
         [`& .${linearProgressClasses.bar}`]: { bgcolor: 'text.primary' },
@@ -42,11 +45,13 @@ const renderFallback = () => (
 export const routesSection: RouteObject[] = [
   {
     element: (
-      <DashboardLayout>
-        <Suspense fallback={renderFallback()}>
-          <Outlet />
-        </Suspense>
-      </DashboardLayout>
+      <ProtectedRoute>
+        <DashboardLayout>
+          <Suspense fallback={renderFallback()}>
+            <Outlet />
+          </Suspense>
+        </DashboardLayout>
+      </ProtectedRoute>
     ),
     children: [
       { index: true, element: <DashboardPage /> },

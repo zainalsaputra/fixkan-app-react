@@ -14,6 +14,8 @@ import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
 
 import { useRouter, usePathname } from 'src/routes/hooks';
 
+import { logout } from 'src/utils/auth-services';
+
 import { _myAccount } from 'src/_mock';
 
 // ----------------------------------------------------------------------
@@ -34,6 +36,8 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
 
   const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
 
+  const [loading, setLoading] = useState(false);
+
   const handleOpenPopover = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
     setOpenPopover(event.currentTarget);
   }, []);
@@ -49,6 +53,17 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
     },
     [handleClosePopover, router]
   );
+
+  const handleLogout = useCallback(async () => {
+    setLoading(true);
+    try {
+      await logout(); // Pastikan fungsi ini menangani redirect
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   return (
     <>
@@ -129,9 +144,17 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <Box sx={{ p: 1 }}>
-          <Button fullWidth color="error" size="medium" variant="text">
-            Logout
+          <Button
+            fullWidth
+            color="error"
+            size="medium"
+            variant="text"
+            onClick={handleLogout}
+            disabled={loading}
+            >
+              {loading ? 'Logged out...' : 'Log Out'}
           </Button>
+
         </Box>
       </Popover>
     </>

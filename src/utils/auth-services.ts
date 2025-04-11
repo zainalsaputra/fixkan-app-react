@@ -21,3 +21,20 @@ export async function login(email: string, password: string) {
     throw error;
   }
 }
+
+export async function logout() {
+  const refreshToken = localStorage.getItem('refreshToken');
+
+  if (!refreshToken) return;
+
+  try {
+    await axiosInstance.post('/auth/logout', {
+      refreshToken: `Bearer ${refreshToken}`,
+    });
+  } catch (error) {
+    console.error('Logout error:', error);
+  } finally {
+    localStorage.clear();
+    window.location.href = '/sign-in';
+  }
+}

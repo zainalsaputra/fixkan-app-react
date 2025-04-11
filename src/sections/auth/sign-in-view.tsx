@@ -39,7 +39,7 @@ export function SignInView() {
         setError('Login gagal. Silakan cek kembali email dan password.');
       }
     } catch (err: any) {
-      setError('Login gagal. Silakan cek kembali email dan password.');
+      setError('Login gagal. Silakan cek kembali email dan password.' + err);
     } finally {
       setLoading(false);
     }
