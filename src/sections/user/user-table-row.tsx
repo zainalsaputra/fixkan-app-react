@@ -25,7 +25,7 @@ export type UserProps = {
     subdistrict: string;
     village: string;
   };
-  avatarUrl: '';
+  avatarUrl?: string;
 };
 
 type UserTableRowProps = {
@@ -69,7 +69,8 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
               alignItems: 'center',
             }}
           >
-            <Avatar alt={row.name} src={row.avatarUrl} />
+            <Avatar alt={row.name} src={`/assets/images/avatar/avatar-${Math.floor(Math.random() * 25) + 1}.webp`}
+            />
             {row.name}
           </Box>
         </TableCell>
