@@ -1,15 +1,15 @@
 import { CONFIG } from 'src/config-global';
 
-import { BlogView } from 'src/sections/blog/view';
+import { NotFoundView } from 'src/sections/error';
 
 // ----------------------------------------------------------------------
 
 export default function Page() {
   return (
     <>
-      <title>{`Blog - ${CONFIG.appName}`}</title>
+      <title>{`403 Forbidden | Error - ${CONFIG.appName}`}</title>
 
-      <BlogView/>
+      <NotFoundView />
     </>
   );
 }

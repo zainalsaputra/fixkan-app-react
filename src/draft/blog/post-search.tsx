@@ -13,24 +13,14 @@ import type { IPostItem } from './post-item';
 type PostSearchProps = {
   posts: IPostItem[];
   sx?: SxProps<Theme>;
-  onSearch?: (query: string) => void;
 };
 
-export function PostSearch({ posts, sx, onSearch }: PostSearchProps) {
-  // Hilangkan duplikat berdasarkan type_report
-  const uniquePosts = Array.from(
-    new Map(posts.map((post) => [post.type_report, post])).values()
-  );
-
+export function PostSearch({ posts, sx }: PostSearchProps) {
   return (
     <Autocomplete
       sx={{ width: 280 }}
       autoHighlight
       popupIcon={null}
-      freeSolo
-      onInputChange={(_, value) => {
-        if (onSearch) onSearch(value);
-      }}
       slotProps={{
         paper: {
           sx: {
@@ -42,16 +32,9 @@ export function PostSearch({ posts, sx, onSearch }: PostSearchProps) {
           },
         },
       }}
-      options={uniquePosts}
-      getOptionLabel={(post) => {
-        if (typeof post === 'string') return post;
-        return post.type_report;
-      }}
-      isOptionEqualToValue={(option, value) =>
-        typeof option !== 'string' &&
-        typeof value !== 'string' &&
-        option.id === value.id
-      }
+      options={posts}
+      getOptionLabel={(post) => post.title}
+      isOptionEqualToValue={(option, value) => option.id === value.id}
       renderInput={(params) => (
         <TextField
           {...params}

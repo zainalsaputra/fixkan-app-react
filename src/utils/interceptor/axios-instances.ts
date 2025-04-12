@@ -30,7 +30,7 @@ axiosInstance.interceptors.response.use(
           window.location.href = '/sign-in';
           return Promise.reject(error);
         }
-        
+
         const res = await axios.post(`${BASE_URL}/auth/refresh`, {
           refreshToken,
         });
@@ -48,6 +48,11 @@ axiosInstance.interceptors.response.use(
         localStorage.clear();
         window.location.href = '/sign-in';
       }
+    }
+
+    if (error.response?.status === 403) {
+      window.location.href = '/sign-in';
+      return Promise.reject(error);
     }
 
     return Promise.reject(error);

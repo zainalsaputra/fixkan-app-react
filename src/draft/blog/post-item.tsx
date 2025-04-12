@@ -10,6 +10,7 @@ import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 
 import { fDate } from 'src/utils/format-time';
+import { fShortenNumber } from 'src/utils/format-number';
 
 import { Iconify } from 'src/components/iconify';
 import { SvgColor } from 'src/components/svg-color';
@@ -18,14 +19,18 @@ import { SvgColor } from 'src/components/svg-color';
 
 export type IPostItem = {
   id: string;
-  userId: string;
-  type_report: string;
+  title: string;
+  coverUrl: string;
+  totalViews: number;
   description: string;
-  province: string;
-  district: string;
-  subdistrict: string;
-  createdAt: string | number | null;
-  image: string;
+  totalShares: number;
+  totalComments: number;
+  totalFavorites: number;
+  postedAt: string | number | null;
+  author: {
+    name: string;
+    avatarUrl: string;
+  };
 };
 
 export function PostItem({
@@ -39,20 +44,10 @@ export function PostItem({
   latestPost: boolean;
   latestPostLarge: boolean;
 }) {
-
-  const capitalizeWords = (str?: string) => {
-    if (!str?.trim()) return '-';
-    return str
-      .toLowerCase()
-      .split(' ')
-      .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  };
-
   const renderAvatar = (
     <Avatar
-      alt={post.userId}
-      src={`/assets/images/avatar/avatar-${Math.floor(Math.random() * 25) + 1}.webp`}
+      alt={post.author.name}
+      src={post.author.avatarUrl}
       sx={{
         left: 24,
         zIndex: 9,
@@ -82,28 +77,9 @@ export function PostItem({
         }),
       }}
     >
-      {post.type_report}
+      {post.title}
     </Link>
   );
-
-  const renderDescription = (
-    <Typography
-      variant="body2"
-      sx={{
-        mt: 0,
-        color: 'text.secondary',
-        ...((latestPostLarge || latestPost) && {
-          color: 'common.white',
-          opacity: 0.64,
-        }),
-      }}
-    >
-      {post.description.length > 99
-        ? post.description.slice(0, 99) + '...'
-        : post.description}
-    </Typography>
-  );
-  
 
   const renderInfo = (
     <Box
@@ -117,9 +93,9 @@ export function PostItem({
       }}
     >
       {[
-        { number: capitalizeWords(post.province), icon: 'solar:map-point-bold' },
-        { number: capitalizeWords(post.district), icon: 'solar:map-bold' },
-        { number: capitalizeWords(post.subdistrict), icon: 'solar:city-bold' },
+        { number: post.totalComments, icon: 'solar:chat-round-dots-bold' },
+        { number: post.totalViews, icon: 'solar:eye-bold' },
+        { number: post.totalShares, icon: 'solar:share-bold' },
       ].map((info, _index) => (
         <Box
           key={_index}
@@ -132,7 +108,7 @@ export function PostItem({
           }}
         >
           <Iconify width={16} icon={info.icon as IconifyName} sx={{ mr: 0.5 }} />
-          <Typography variant="caption">{info.number}</Typography>
+          <Typography variant="caption">{fShortenNumber(info.number)}</Typography>
         </Box>
       ))}
     </Box>
@@ -141,8 +117,8 @@ export function PostItem({
   const renderCover = (
     <Box
       component="img"
-      alt={post.type_report}
-      src={post.image}
+      alt={post.title}
+      src={post.coverUrl}
       sx={{
         top: 0,
         width: 1,
@@ -166,7 +142,7 @@ export function PostItem({
         }),
       }}
     >
-      {fDate(post.createdAt)}
+      {fDate(post.postedAt)}
     </Typography>
   );
 
@@ -228,7 +204,6 @@ export function PostItem({
       >
         {renderDate}
         {renderTitle}
-        {renderDescription}
         {renderInfo}
       </Box>
     </Card>
