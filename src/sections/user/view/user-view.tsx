@@ -37,7 +37,7 @@ export function UserView() {
   const [filterName, setFilterName] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  const TTL =  120 * 1000;
+  const TTL = 180 * 1000;
 
   useEffect(() => {
 

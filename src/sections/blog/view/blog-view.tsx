@@ -31,7 +31,7 @@ export function BlogView() {
   const [isLoading, setIsLoading] = useState(true);
 
   const postsPerPage = 7;
-  const TTL = 120 * 1000;
+  const TTL = 180 * 1000;
 
   const loadReports = async (forceRefresh = false) => {
     try {
