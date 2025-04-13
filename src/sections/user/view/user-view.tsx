@@ -37,51 +37,71 @@ export function UserView() {
   const [filterName, setFilterName] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
+  const TTL =  120 * 1000;
+
   useEffect(() => {
+
     const getUsers = async () => {
       try {
         setIsLoading(true);
-  
+
         const cachedUsers = localStorage.getItem('users');
-        if (cachedUsers) {
+        const cachedTime = localStorage.getItem('users_timestamp');
+        const now = Date.now();
+        const isExpired = !cachedTime || now - Number(cachedTime) > TTL;
+
+        if (cachedUsers && !isExpired) {
           setUsers(JSON.parse(cachedUsers));
-          setIsLoading(false);
           return;
         }
-  
+
         const data = await fetchUsers();
         setUsers(data);
         localStorage.setItem('users', JSON.stringify(data));
+        localStorage.setItem('users_timestamp', now.toString());
       } catch (error) {
         console.error('Failed to fetch users:', error);
       } finally {
         setIsLoading(false);
       }
     };
-  
+
     getUsers();
   }, []);
-  
+
+  const handleRefresh = async () => {
+    try {
+      setIsLoading(true);
+      const data = await fetchUsers();
+      setUsers(data);
+      localStorage.setItem('users', JSON.stringify(data));
+      localStorage.setItem('users_timestamp', Date.now().toString());
+    } catch (error) {
+      console.error('Failed to refresh users:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };  
 
   if (isLoading) {
-    return(
+    return (
       <Box
-    sx={{
-      display: 'flex',
-      flex: '1 1 auto',
-      alignItems: 'center',
-      justifyContent: 'center',
-    }}
-  >
-    <LinearProgress
-      sx={{
-        width: 1,
-        maxWidth: 320,
-        bgcolor: (theme) => varAlpha(theme.vars.palette.text.primaryChannel, 0.16),
-        [`& .${linearProgressClasses.bar}`]: { bgcolor: 'text.primary' },
-      }}
-    />
-  </Box>
+        sx={{
+          display: 'flex',
+          flex: '1 1 auto',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <LinearProgress
+          sx={{
+            width: 1,
+            maxWidth: 320,
+            bgcolor: (theme) => varAlpha(theme.vars.palette.text.primaryChannel, 0.16),
+            [`& .${linearProgressClasses.bar}`]: { bgcolor: 'text.primary' },
+          }}
+        />
+      </Box>
     )
   }
 
@@ -100,19 +120,33 @@ export function UserView() {
           mb: 5,
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 2,
         }}
       >
-        <Typography variant="h4" sx={{ flexGrow: 1 }}>
-          Users
-        </Typography>
-        <Button
-          variant="contained"
-          color="inherit"
-          startIcon={<Iconify icon="mingcute:add-line" />}
-        >
-          New user
-        </Button>
+        <Typography variant="h4">Users</Typography>
+
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={handleRefresh}
+            startIcon={<Iconify icon="solar:restart-bold" />}
+          >
+            Refresh
+          </Button>
+
+          <Button
+            variant="contained"
+            color="inherit"
+            startIcon={<Iconify icon="mingcute:add-line" />}
+          >
+            New user
+          </Button>
+        </Box>
       </Box>
+
 
       <Card>
         <UserTableToolbar

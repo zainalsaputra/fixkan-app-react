@@ -3,6 +3,7 @@ import { varAlpha } from 'minimal-shared/utils';
 
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Pagination from '@mui/material/Pagination';
@@ -30,37 +31,51 @@ export function BlogView() {
   const [isLoading, setIsLoading] = useState(true);
 
   const postsPerPage = 7;
+  const TTL =  120 * 1000;
 
-  const TTL = 60 * 1000;
+  const loadReports = async (forceRefresh = false) => {
+    try {
+      const cached = localStorage.getItem('reports');
+      const cachedTime = localStorage.getItem('reports_timestamp');
+      const now = Date.now();
+      const isExpired = !cachedTime || now - Number(cachedTime) > TTL;
 
-  useEffect(() => {
-    const getReports = async () => {
-      try {
-        const cached = localStorage.getItem('reports');
-        const cachedTime = localStorage.getItem('reports_timestamp');
+      if (!forceRefresh && cached) {
+        const parsed = JSON.parse(cached);
 
-        const now = Date.now();
-        const isExpired = !cachedTime || now - Number(cachedTime) > TTL;
-
-        if (cached && !isExpired) {
-          setPosts(JSON.parse(cached));
+        if (Array.isArray(parsed) && parsed.length === 0) {
+          const data = await fetchReports();
+          setPosts(data);
+          localStorage.setItem('reports', JSON.stringify(data));
+          localStorage.setItem('reports_timestamp', now.toString());
           return;
         }
 
-        const data = await fetchReports();
-        setPosts(data);
-        localStorage.setItem('reports', JSON.stringify(data));
-        localStorage.setItem('reports_timestamp', now.toString());
-      } catch (error) {
-        console.error('Failed to fetch posts:', error);
-      } finally {
-        setIsLoading(false);
+        if (!isExpired) {
+          setPosts(parsed);
+          return;
+        }
       }
-    };
 
-    getReports();
+      const data = await fetchReports();
+      setPosts(data);
+      localStorage.setItem('reports', JSON.stringify(data));
+      localStorage.setItem('reports_timestamp', now.toString());
+    } catch (error) {
+      console.error('Failed to fetch posts:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadReports();
   }, []);
 
+  const handleRefresh = async () => {
+    setIsLoading(true);
+    await loadReports(true);
+  };
 
   // Filter by search
   const filteredPosts = posts.filter((post) =>
@@ -77,7 +92,6 @@ export function BlogView() {
     return 0;
   });
 
-
   // Paginate
   const totalPages = Math.ceil(sortedPosts.length / postsPerPage);
   const currentPosts = sortedPosts.slice(
@@ -85,7 +99,6 @@ export function BlogView() {
     currentPage * postsPerPage
   );
 
-  // Handle Loading
   if (isLoading) {
     return (
       <Box
@@ -110,18 +123,28 @@ export function BlogView() {
 
   return (
     <DashboardContent>
-      <Box sx={{ mb: 5, display: 'flex', alignItems: 'center' }}>
-        <Typography variant="h4" sx={{ flexGrow: 1 }}>
-          Blog
-        </Typography>
-        <Button
-          variant="contained"
-          color="inherit"
-          startIcon={<Iconify icon="mingcute:add-line" />}
-        >
-          New post
-        </Button>
-      </Box>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2} sx={{ mb: 5 }}>
+        <Typography variant="h4">Reports</Typography>
+
+        <Stack direction="row" spacing={1}>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={handleRefresh}
+            startIcon={<Iconify icon="solar:restart-bold"/>}
+          >
+            Refresh
+          </Button>
+
+          <Button
+            variant="contained"
+            color="inherit"
+            startIcon={<Iconify icon="mingcute:add-line" />}
+          >
+            Prints
+          </Button>
+        </Stack>
+      </Stack>
 
       <Box
         sx={{

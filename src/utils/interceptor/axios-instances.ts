@@ -26,7 +26,9 @@ axiosInstance.interceptors.response.use(
         const refreshToken = localStorage.getItem('refreshToken');
 
         if (!refreshToken) {
-          localStorage.clear();
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          localStorage.setItem('redirectAfterLogin', window.location.pathname);
           window.location.href = '/sign-in';
           return Promise.reject(error);
         }
@@ -44,13 +46,15 @@ axiosInstance.interceptors.response.use(
         return axiosInstance(originalRequest);
       } catch (err) {
         console.error('Refresh token failed', err);
-
         localStorage.clear();
         window.location.href = '/sign-in';
       }
     }
 
     if (error.response?.status === 403) {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.setItem('redirectAfterLogin', window.location.pathname);
       window.location.href = '/sign-in';
       return Promise.reject(error);
     }
