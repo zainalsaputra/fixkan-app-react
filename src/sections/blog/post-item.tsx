@@ -24,7 +24,7 @@ export type IPostItem = {
   province: string;
   district: string;
   subdistrict: string;
-  createdAt: string | number | null;
+  createdAt: string;
   image: string;
 };
 

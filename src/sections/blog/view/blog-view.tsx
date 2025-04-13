@@ -79,8 +79,10 @@ export function BlogView() {
 
   // Filter by search
   const filteredPosts = posts.filter((post) =>
-    post.type_report.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+    Object.values(post).some((value) =>
+      String(value).toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  );  
 
   // Sort
   const sortedPosts = [...filteredPosts].sort((a, b) => {

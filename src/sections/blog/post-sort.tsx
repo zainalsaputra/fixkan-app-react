@@ -6,6 +6,7 @@ import { varAlpha } from 'minimal-shared/utils';
 import Button from '@mui/material/Button';
 import Popover from '@mui/material/Popover';
 import MenuList from '@mui/material/MenuList';
+import Typography from '@mui/material/Typography';
 import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
 
 import { Iconify } from 'src/components/iconify';
@@ -51,7 +52,10 @@ export function PostSort({ options, sortBy, onSort, sx, ...other }: PostSortProp
         ]}
         {...other}
       >
-        {options.find((option) => option.value === sortBy)?.label}
+         Sort By:&nbsp;
+        <Typography component="span" variant="subtitle2" sx={{ color: 'text.secondary' }}>
+          {options.find((option) => option.value === sortBy)?.label}
+        </Typography>
       </Button>
 
       <Popover
