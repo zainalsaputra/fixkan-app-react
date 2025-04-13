@@ -31,7 +31,7 @@ export function BlogView() {
   const [isLoading, setIsLoading] = useState(true);
 
   const postsPerPage = 7;
-  const TTL =  120 * 1000;
+  const TTL = 120 * 1000;
 
   const loadReports = async (forceRefresh = false) => {
     try {
@@ -82,7 +82,7 @@ export function BlogView() {
     Object.values(post).some((value) =>
       String(value).toLowerCase().includes(searchQuery.toLowerCase())
     )
-  );  
+  );
 
   // Sort
   const sortedPosts = [...filteredPosts].sort((a, b) => {
@@ -133,7 +133,7 @@ export function BlogView() {
             variant="outlined"
             color="primary"
             onClick={handleRefresh}
-            startIcon={<Iconify icon="solar:restart-bold"/>}
+            startIcon={<Iconify icon="solar:restart-bold" />}
           >
             Refresh
           </Button>
@@ -176,29 +176,44 @@ export function BlogView() {
         />
       </Box>
 
-      <Grid container spacing={3}>
-        {currentPosts.map((post, index) => {
-          const latestPostLarge = index === 0;
-          const latestPost = index === 1 || index === 2;
+      {currentPosts.length === 0 ? (
+        <Box
+          sx={{
+            width: '100%',
+            textAlign: 'center',
+            mt: 10,
+            color: 'text.secondary',
+          }}
+        >
+          <Iconify icon="solar:document-bold" width={48} sx={{ mb: 2 }} />
+          <Typography variant="h6">Tidak ada hasil ditemukan</Typography>
+        </Box>
+      ) : (
+        <Grid container spacing={3}>
+          {currentPosts.map((post, index) => {
+            const latestPostLarge = index === 0;
+            const latestPost = index === 1 || index === 2;
 
-          return (
-            <Grid
-              key={post.id}
-              size={{
-                xs: 12,
-                sm: latestPostLarge ? 12 : 6,
-                md: latestPostLarge ? 6 : 3,
-              }}
-            >
-              <PostItem
-                post={post}
-                latestPost={latestPost}
-                latestPostLarge={latestPostLarge}
-              />
-            </Grid>
-          );
-        })}
-      </Grid>
+            return (
+              <Grid
+                key={post.id}
+                size={{
+                  xs: 12,
+                  sm: latestPostLarge ? 12 : 6,
+                  md: latestPostLarge ? 6 : 3,
+                }}
+              >
+                <PostItem
+                  post={post}
+                  latestPost={latestPost}
+                  latestPostLarge={latestPostLarge}
+                />
+              </Grid>
+            );
+          })}
+        </Grid>
+      )}
+
 
       <Pagination
         count={totalPages}

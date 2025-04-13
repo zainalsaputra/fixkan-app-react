@@ -90,61 +90,61 @@ export function PostSearch({ posts, sx, onSearch }: PostSearchProps) {
 
   return (
     <Autocomplete
-      sx={{ width: 280 }}
-      autoHighlight
-      popupIcon={null}
-      freeSolo
-      onInputChange={(_, value) => {
-        setQuery(value);
-        if (onSearch) onSearch(value);
-      }}
-      slotProps={{
-        paper: {
-          sx: {
-            width: 320,
-            [`& .${autocompleteClasses.option}`]: {
-              typography: 'body2',
-            },
-            ...sx,
+    sx={{ width: 280 }}
+    autoHighlight
+    popupIcon={null}
+    freeSolo
+    onInputChange={(_, value) => {
+      setQuery(value);
+      if (onSearch) onSearch(value);
+    }}
+    noOptionsText={query ? 'Tidak ada hasil ditemukan' : 'Ketik untuk mencari'}
+    slotProps={{
+      paper: {
+        sx: {
+          width: 320,
+          [`& .${autocompleteClasses.option}`]: {
+            typography: 'body2',
           },
+          ...sx,
         },
-      }}
-      options={filteredPosts}
-      getOptionLabel={(post) => {
-        if (typeof post === 'string') return toTitleCase(post);
-        return toTitleCase(getFirstMatchingText(post, query));
-      }}      
-      isOptionEqualToValue={(option, value) =>
-        typeof option !== 'string' &&
-        typeof value !== 'string' &&
-        option.id === value.id
-      }
-      renderOption={(props, option) => {
-        const text = toTitleCase(getFirstMatchingText(option, query));
-        return (
-          <li {...props}>
-            {highlightMatch(text, query)}
-          </li>
-        );
-      }}
-      
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          placeholder="Search post..."
-          InputProps={{
-            ...params.InputProps,
-            startAdornment: (
-              <InputAdornment position="start">
-                <Iconify
-                  icon="eva:search-fill"
-                  sx={{ ml: 1, width: 20, height: 20, color: 'text.disabled' }}
-                />
-              </InputAdornment>
-            ),
-          }}
-        />
-      )}
-    />
+      },
+    }}
+    options={filteredPosts}
+    getOptionLabel={(post) => {
+      if (typeof post === 'string') return toTitleCase(post);
+      return toTitleCase(getFirstMatchingText(post, query));
+    }}
+    isOptionEqualToValue={(option, value) =>
+      typeof option !== 'string' &&
+      typeof value !== 'string' &&
+      option.id === value.id
+    }
+    renderOption={(props, option) => {
+      const text = toTitleCase(getFirstMatchingText(option, query));
+      return (
+        <li {...props}>
+          {highlightMatch(text, query)}
+        </li>
+      );
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        placeholder="Search post..."
+        InputProps={{
+          ...params.InputProps,
+          startAdornment: (
+            <InputAdornment position="start">
+              <Iconify
+                icon="eva:search-fill"
+                sx={{ ml: 1, width: 20, height: 20, color: 'text.disabled' }}
+              />
+            </InputAdornment>
+          ),
+        }}
+      />
+    )}
+  />  
   );
 }
