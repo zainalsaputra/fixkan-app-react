@@ -100,6 +100,11 @@ export const _products = [...Array(24)].map((_, index) => {
 
 export const _langs = [
   {
+    value: 'in',
+    label: 'Indonesia',
+    icon: '/assets/icons/flags/ic-flag-in.svg',
+  },
+  {
     value: 'en',
     label: 'English',
     icon: '/assets/icons/flags/ic-flag-en.svg',

@@ -1,20 +1,23 @@
 import 'leaflet/dist/leaflet.css';
 
 import L from 'leaflet';
+import { useSnackbar } from 'notistack';
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
 import { varAlpha } from 'minimal-shared/utils';
 import MarkerClusterGroup from 'react-leaflet-cluster';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Popup, Marker, TileLayer, MapContainer } from 'react-leaflet';
 
 import MapIcon from '@mui/icons-material/Map';
+import DeleteIcon from '@mui/icons-material/Delete';
 import {
-  Box, Card, Divider, CardMedia,
-  Typography, IconButton, CardContent, LinearProgress,
-  linearProgressClasses
+  Box, Card, Alert, Dialog,
+  Button, Divider, Snackbar, CardMedia,
+  Typography, IconButton, CardContent,
+  DialogTitle, DialogActions, DialogContent, LinearProgress, DialogContentText, linearProgressClasses
 } from '@mui/material';
 
-import { fetchReports } from 'src/utils/reports-services';
+import { fetchReports, deleteReport } from 'src/utils/reports-services';
 
 const customIcon = new L.Icon({
   iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
@@ -44,8 +47,12 @@ type ReportDetail = {
 
 export function PostDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [data, setData] = useState<ReportDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const cacheKey = `report-${id}`;
@@ -75,6 +82,34 @@ export function PostDetail() {
       });
   }, [id]);
 
+  const { enqueueSnackbar } = useSnackbar();
+
+  const handleDelete = async (reportId: string) => {
+    try {
+      setIsDeleting(true);
+  
+      await deleteReport(`/${reportId}`);
+  
+      localStorage.removeItem(`report-${reportId}`);
+      localStorage.removeItem(`report-${reportId}-timestamp`);
+  
+      setOpenConfirm(false);
+  
+      setTimeout(() => {
+        enqueueSnackbar('Postingan berhasil dihapus!', { variant: 'success' });
+      }, 300);
+  
+      setTimeout(() => {
+        navigate('/report');
+      }, 3000);
+    } catch (err) {
+      console.error('Delete failed:', err);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+  
+  
   const capitalizeWords = (str?: string) => {
     if (!str?.trim()) return '-';
     return str
@@ -83,16 +118,10 @@ export function PostDetail() {
       .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
   };
+
   if (isLoading) {
     return (
-      <Box
-        sx={{
-          display: 'flex',
-          flex: '1 1 auto',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
+      <Box sx={{ display: 'flex', flex: '1 1 auto', alignItems: 'center', justifyContent: 'center' }}>
         <LinearProgress
           sx={{
             width: 1,
@@ -111,26 +140,34 @@ export function PostDetail() {
 
   return (
     <Card sx={{ maxWidth: 900, mx: 'auto', mt: 5, p: 3 }}>
-      <Box
-        sx={{
-          width: '100%',
-          borderRadius: 2,
-          overflow: 'hidden',
-          mb: 3,
-        }}
-      >
+      <Box sx={{ position: 'relative' }}>
         <CardMedia
           component="img"
           image={data.image}
           alt={data.type_report}
-          sx={{
-            height: '100%',
-            width: '100%',
-            objectFit: 'cover',
-          }}
+          sx={{ height: '100%', width: '100%', objectFit: 'cover', borderRadius: 2 }}
         />
+        <IconButton
+          onClick={() => setOpenConfirm(true)}
+          sx={{
+            position: 'absolute',
+            top: 16,
+            right: 16,
+            border: '2px solid',
+            borderColor: 'error.main',
+            bgcolor: 'white',
+            color: 'error.main',
+            boxShadow: 3,
+            width: 48,
+            height: 48,
+            '&:hover': {
+              bgcolor: 'error.light',
+            },
+          }}
+        >
+          <DeleteIcon />
+        </IconButton>
       </Box>
-
 
       <CardContent>
         <Typography variant="h4" fontWeight={700} gutterBottom>
@@ -172,14 +209,12 @@ export function PostDetail() {
           </Box>
         </Box>
 
-        {data.latitude === '0.00000000' && data.longitude === '0.00000000' && (
+        {data.latitude === '0.00000000' && data.longitude === '0.00000000' ? (
           <Box mt={2}>
             <Typography variant="subtitle1" fontWeight={600}>Lokasi Peta</Typography>
             <Typography variant="body2">Peta tidak tersedia, pelapor tidak mencantumkan koordinat.</Typography>
           </Box>
-        )}
-
-        {data.latitude !== '0.00000000' && data.longitude !== '0.00000000' && (
+        ) : (
           <Box mt={2}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Typography variant="subtitle1" fontWeight={600}>Lokasi Peta</Typography>
@@ -191,7 +226,6 @@ export function PostDetail() {
               >
                 <MapIcon color="primary" />
               </IconButton>
-
             </Box>
 
             <Box position="relative">
@@ -236,8 +270,39 @@ export function PostDetail() {
             Dilaporkan pada: {new Date(data.createdAt).toLocaleString()}
           </Typography>
         </Box>
-
       </CardContent>
+
+      {/* Dialog Konfirmasi Hapus */}
+      <Dialog open={openConfirm} onClose={() => setOpenConfirm(false)}>
+        <DialogTitle>Konfirmasi Penghapusan</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Yakin ingin menghapus postingan ini? Tindakan ini tidak bisa dibatalkan.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenConfirm(false)}>Batal</Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => handleDelete(`${id}`)}
+            disabled={isDeleting}
+          >
+            {isDeleting ? 'Menghapus...' : 'Hapus'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="success" variant="filled" onClose={() => setSnackbarOpen(false)}>
+          Postingan berhasil dihapus!
+        </Alert>
+      </Snackbar>
     </Card>
   );
 }
