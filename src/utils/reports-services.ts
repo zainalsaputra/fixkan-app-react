@@ -38,7 +38,7 @@ export async function deleteReport(route: string = '/') {
   }
 
   try {
-    const response = await axiosInstance.get(`${BASE_URL}/reports${route}`, {
+    const response = await axiosInstance.delete(`${BASE_URL}/reports${route}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
