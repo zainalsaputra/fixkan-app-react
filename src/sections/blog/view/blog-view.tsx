@@ -43,7 +43,9 @@ export function BlogView() {
       if (!forceRefresh && cached) {
         const parsed = JSON.parse(cached);
 
+        // Check if the cached data is valid
         if (Array.isArray(parsed) && parsed.length === 0) {
+          // In case the cache is empty or invalid, fetch fresh data
           const data = await fetchReports();
           setPosts(data);
           localStorage.setItem('reports', JSON.stringify(data));

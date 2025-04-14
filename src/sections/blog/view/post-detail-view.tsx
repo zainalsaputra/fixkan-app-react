@@ -90,6 +90,7 @@ export function PostDetail() {
   
       await deleteReport(`/${reportId}`);
   
+      localStorage.removeItem(`reports`);
       localStorage.removeItem(`report-${reportId}`);
       localStorage.removeItem(`report-${reportId}-timestamp`);
   
@@ -100,7 +101,7 @@ export function PostDetail() {
       }, 300);
   
       setTimeout(() => {
-        navigate('/report');
+        navigate('/report', { replace: true });
       }, 3000);
     } catch (err) {
       console.error('Delete failed:', err);
