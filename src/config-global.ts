@@ -8,6 +8,6 @@ export type ConfigValue = {
 };
 
 export const CONFIG: ConfigValue = {
-  appName: 'Minimal UI',
+  appName: 'Fixkan Dashboard Admin',
   appVersion: packageJson.version,
 };
