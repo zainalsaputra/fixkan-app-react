@@ -70,7 +70,7 @@ export function PostItem({
   const renderTitle = (
     <Link
       component={RouterLink as any}
-      to={`/blog/${post.id}`}
+      to={`/report/${post.id}`}
       color="inherit"
       variant="subtitle2"
       underline="hover"

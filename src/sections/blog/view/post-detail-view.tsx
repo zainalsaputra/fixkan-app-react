@@ -3,14 +3,18 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { varAlpha } from 'minimal-shared/utils';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { Popup, Marker, TileLayer, MapContainer } from 'react-leaflet';
 
 import MapIcon from '@mui/icons-material/Map';
 import {
-  Box, Card, CardMedia, Typography,
-  IconButton, CardContent, CircularProgress, Divider
+  Box, Card, Divider, CardMedia,
+  Typography, IconButton, CardContent, LinearProgress,
+  linearProgressClasses
 } from '@mui/material';
+
+import { fetchReports } from 'src/utils/reports-services';
 
 const customIcon = new L.Icon({
   iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
@@ -41,43 +45,35 @@ type ReportDetail = {
 export function PostDetail() {
   const { id } = useParams();
   const [data, setData] = useState<ReportDetail | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const BASE_URL = import.meta.env.VITE_PUBLIC_API_BASE_URL;
-  const token = localStorage.getItem('accessToken');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const cacheKey = `report-${id}`;
     const timestampKey = `report-${id}-timestamp`;
     const cached = localStorage.getItem(cacheKey);
     const cachedTime = localStorage.getItem(timestampKey);
-    const TTL = 3 * 60 * 1000; // 3 menit
+    const TTL = 3 * 60 * 1000;
     const now = Date.now();
     const isExpired = !cachedTime || now - Number(cachedTime) > TTL;
-  
+
     if (cached && !isExpired) {
       setData(JSON.parse(cached));
-      setLoading(false);
+      setIsLoading(false);
       return;
     }
-  
-    fetch(`${BASE_URL}/reports/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => res.json())
+
+    fetchReports(`/${id}`)
       .then((res) => {
-        setData(res.data);
-        setLoading(false);
-        localStorage.setItem(cacheKey, JSON.stringify(res.data));
+        setData(res);
+        setIsLoading(false);
+        localStorage.setItem(cacheKey, JSON.stringify(res));
         localStorage.setItem(timestampKey, now.toString());
       })
       .catch((err) => {
         console.error('Failed to fetch report detail:', err);
-        setLoading(false);
+        setIsLoading(false);
       });
-  }, [id]);  
+  }, [id]);
 
   const capitalizeWords = (str?: string) => {
     if (!str?.trim()) return '-';
@@ -87,8 +83,28 @@ export function PostDetail() {
       .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
   };
+  if (isLoading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          flex: '1 1 auto',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <LinearProgress
+          sx={{
+            width: 1,
+            maxWidth: 320,
+            bgcolor: (theme) => varAlpha(theme.vars.palette.text.primaryChannel, 0.16),
+            [`& .${linearProgressClasses.bar}`]: { bgcolor: 'text.primary' },
+          }}
+        />
+      </Box>
+    );
+  }
 
-  if (loading) return <Box display="flex" justifyContent="center" mt={5}><CircularProgress /></Box>;
   if (!data) return <Typography>No data found.</Typography>;
 
   const position: [number, number] = [parseFloat(data.latitude), parseFloat(data.longitude)];

@@ -58,8 +58,8 @@ export const routesSection: RouteObject[] = [
       { index: true, element: <DashboardPage /> },
       { path: 'user', element: <UserPage /> },
       { path: 'products', element: <ProductsPage /> },
-      { path: 'blog', element: <BlogPage /> },
-      { path: 'blog/:id', element: <PostDetailPage /> },
+      { path: 'report', element: <BlogPage /> },
+      { path: 'report/:id', element: <PostDetailPage /> },
     ],
   },
   {
