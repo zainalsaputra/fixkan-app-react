@@ -1,8 +1,7 @@
 import 'src/global.css';
+import 'leaflet/dist/leaflet.css';
 
 import { useEffect } from 'react';
-
-import Fab from '@mui/material/Fab';
 
 import { usePathname } from 'src/routes/hooks';
 
